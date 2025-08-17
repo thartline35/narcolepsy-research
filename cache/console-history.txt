@@ -1,0 +1,20 @@
+.exit
+// Exit console
+console.log("Had temperature change:", symptoms.suddenTempChange);
+console.log("Had dizziness:", symptoms.dizziness);
+contract.getEpisodeSymptoms(0);
+const symptoms = await 
+// Get symptoms
+console.log("Episode type:", episode.episoconsole.log("Severity:", episode.episodeSeverity);
+const episode = await contract.getEpisode(0);
+// Get episode data
+console.log("Total episodes:", total.toString());
+const total = await contract.getTotalEpisodes();
+// Check total episodes
+);
+  true, true, false, true, false, false, true, true, false, false
+  1, 7, 8, 6, 14, 30, 8, 2, 5, 7, true, false,
+await contract.reportEpisodeComplete(
+// Submit a test episode
+const contract = await ethers.15678afecb367f032d93F642f64180aa3");
+// Get the contract
