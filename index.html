@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Narcolepsy Early Warning Research</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-item input {
+            width: auto;
+            margin-right: 8px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .stats {
+            background-color: #e8f4f8;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .contract-info {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Narcolepsy Early Warning Research</h1>
+        
+        <div class="contract-info">
+            <strong>Contract Address:</strong> <span id="contractAddress">Not connected</span><br>
+            <strong>Network:</strong> <span id="networkName">Not connected</span><br>
+            <strong>Your Account:</strong> <span id="userAccount">Not connected</span>
+        </div>
+
+        <div class="stats">
+            <h3>📊 Current Research Data</h3>
+            <p><strong>Total Episodes Reported:</strong> <span id="totalEpisodes">Loading...</span></p>
+            <p><strong>Total Participants:</strong> <span id="totalParticipants">Loading...</span></p>
+            <button onclick="loadStats()">Refresh Stats</button>
+        </div>
+
+        <h2>Report an Episode</h2>
+        <form id="episodeForm">
+            <!-- Basic Episode Info -->
+            <div class="form-group">
+                <label for="episodeType">Episode Type:</label>
+                <select id="episodeType" required>
+                    <option value="">Select episode type</option>
+                    <option value="1">Sleep Attack</option>
+                    <option value="2">Cataplexy</option>
+                    <option value="3">Hallucination</option>
+                    <option value="4">Sleep Paralysis</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="severity">Severity (1-10):</label>
+                <input type="number" id="severity" min="1" max="10" required>
+            </div>
+
+            <div class="form-group">
+                <label for="stressLevel">Stress Level (1-10):</label>
+                <input type="number" id="stressLevel" min="1" max="10" required>
+            </div>
+
+            <div class="form-group">
+                <label for="sleepQuality">Sleep Quality Last Night (1-10):</label>
+                <input type="number" id="sleepQuality" min="1" max="10" required>
+            </div>
+
+            <div class="form-group">
+                <label for="timeOfDay">Time of Day (0-23):</label>
+                <input type="number" id="timeOfDay" min="0" max="23" required>
+            </div>
+
+            <div class="form-group">
+                <label for="warningMinutes">Warning Time (minutes before episode):</label>
+                <input type="number" id="warningMinutes" min="0" max="120" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confidence">Confidence Level (1-10):</label>
+                <input type="number" id="confidence" min="1" max="10" required>
+            </div>
+
+            <div class="form-group">
+                <label for="ageRange">Age Range:</label>
+                <select id="ageRange" required>
+                    <option value="">Select age range</option>
+                    <option value="1">18-25</option>
+                    <option value="2">26-35</option>
+                    <option value="3">36-45</option>
+                    <option value="4">46-55</option>
+                    <option value="5">56+</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="yearsSinceDiagnosis">Years Since Diagnosis:</label>
+                <input type="number" id="yearsSinceDiagnosis" min="0" max="50" required>
+            </div>
+
+            <div class="form-group">
+                <label for="overallSeverity">Overall Narcolepsy Severity (1-10):</label>
+                <input type="number" id="overallSeverity" min="1" max="10" required>
+            </div>
+
+            <!-- Context -->
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="hadCaffeine"> Had caffeine within 4 hours
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="hadMeal"> Had meal within 2 hours
+                </label>
+            </div>
+
+            <!-- Symptoms -->
+            <div class="form-group">
+                <label>Pre-Episode Symptoms (check all that apply):</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tempChange">
+                        <label for="tempChange">Temperature change</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="dizziness">
+                        <label for="dizziness">Dizziness</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="nausea">
+                        <label for="nausea">Nausea</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tingling">
+                        <label for="tingling">Tingling</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="headache">
+                        <label for="headache">Headache</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="blurredVision">
+                        <label for="blurredVision">Blurred vision</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="moodChange">
+                        <label for="moodChange">Mood change</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cognitiveSlowing">
+                        <label for="cognitiveSlowing">Brain fog</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="muscleWeakness">
+                        <label for="muscleWeakness">Muscle weakness</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="restlessness">
+                        <label for="restlessness">Restlessness</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">Submit Episode Report</button>
+        </form>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        // Contract configuration
+        const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Your deployed contract address
+        const CONTRACT_ABI = [
+            "function reportEpisodeComplete(uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool) external",
+            "function getTotalEpisodes() external view returns (uint256)",
+            "function totalParticipants() external view returns (uint256)",
+            "function getEpisode(uint256) external view returns (tuple(uint8,uint8,uint256,uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8,bool,bool))",
+            "function getEpisodeSymptoms(uint256) external view returns (tuple(bool,bool,bool,bool,bool,bool,bool,bool,bool,bool))"
+        ];
+
+        let provider, signer, contract;
+
+        // Initialize the app
+        async function init() {
+            try {
+                if (typeof window.ethereum !== 'undefined') {
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = await provider.getSigner();
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    
+                    // Update UI
+                    document.getElementById('contractAddress').textContent = CONTRACT_ADDRESS;
+                    document.getElementById('userAccount').textContent = await signer.getAddress();
+                    
+                    const network = await provider.getNetwork();
+                    document.getElementById('networkName').textContent = network.name + " (Chain ID: " + network.chainId + ")";
+                    
+                    await loadStats();
+                } else {
+                    showStatus('Please install MetaMask to use this application.', 'error');
+                }
+            } catch (error) {
+                showStatus('Error connecting to wallet: ' + error.message, 'error');
+            }
+        }
+
+        // Load contract statistics
+        async function loadStats() {
+            try {
+                const totalEpisodes = await contract.getTotalEpisodes();
+                const totalParticipants = await contract.totalParticipants();
+                
+                document.getElementById('totalEpisodes').textContent = totalEpisodes.toString();
+                document.getElementById('totalParticipants').textContent = totalParticipants.toString();
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('totalEpisodes').textContent = 'Error loading';
+                document.getElementById('totalParticipants').textContent = 'Error loading';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('episodeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!contract) {
+                showStatus('Please connect your wallet first.', 'error');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                // Collect form data
+                const formData = {
+                    episodeType: parseInt(document.getElementById('episodeType').value),
+                    severity: parseInt(document.getElementById('severity').value),
+                    stressLevel: parseInt(document.getElementById('stressLevel').value),
+                    sleepQuality: parseInt(document.getElementById('sleepQuality').value),
+                    timeOfDay: parseInt(document.getElementById('timeOfDay').value),
+                    warningMinutes: parseInt(document.getElementById('warningMinutes').value),
+                    confidence: parseInt(document.getElementById('confidence').value),
+                    ageRange: parseInt(document.getElementById('ageRange').value),
+                    yearsSinceDiagnosis: parseInt(document.getElementById('yearsSinceDiagnosis').value),
+                    overallSeverity: parseInt(document.getElementById('overallSeverity').value),
+                    hadCaffeine: document.getElementById('hadCaffeine').checked,
+                    hadMeal: document.getElementById('hadMeal').checked,
+                    tempChange: document.getElementById('tempChange').checked,
+                    dizziness: document.getElementById('dizziness').checked,
+                    nausea: document.getElementById('nausea').checked,
+                    tingling: document.getElementById('tingling').checked,
+                    headache: document.getElementById('headache').checked,
+                    blurredVision: document.getElementById('blurredVision').checked,
+                    moodChange: document.getElementById('moodChange').checked,
+                    cognitiveSlowing: document.getElementById('cognitiveSlowing').checked,
+                    muscleWeakness: document.getElementById('muscleWeakness').checked,
+                    restlessness: document.getElementById('restlessness').checked
+                };
+
+                // Submit to blockchain
+                const tx = await contract.reportEpisodeComplete(
+                    formData.episodeType, formData.severity, formData.stressLevel,
+                    formData.sleepQuality, formData.timeOfDay, formData.warningMinutes,
+                    formData.confidence, formData.ageRange, formData.yearsSinceDiagnosis,
+                    formData.overallSeverity, formData.hadCaffeine, formData.hadMeal,
+                    formData.tempChange, formData.dizziness, formData.nausea,
+                    formData.tingling, formData.headache, formData.blurredVision,
+                    formData.moodChange, formData.cognitiveSlowing, formData.muscleWeakness,
+                    formData.restlessness
+                );
+
+                showStatus('Transaction submitted! Waiting for confirmation...', 'success');
+                
+                await tx.wait();
+                
+                showStatus('Episode report submitted successfully! Thank you for contributing to narcolepsy research.', 'success');
+                document.getElementById('episodeForm').reset();
+                await loadStats();
+
+            } catch (error) {
+                showStatus('Error submitting episode: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Episode Report';
+            }
+        });
+
+        // Show status messages
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

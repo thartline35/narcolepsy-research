@@ -1,0 +1,10 @@
+{
+  "contractAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "deployerAddress": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "network": "localhost",
+  "chainId": "31337",
+  "transactionHash": "0x54dee0638521cfd1f45c5ef9a02f0aced38ab3410c21eb8e07bcbd6b8f7d1cc9",
+  "deploymentCost": "0.001430900912109375",
+  "gasUsed": "1292101",
+  "timestamp": "2025-08-17T22:14:30.670Z"
+}
